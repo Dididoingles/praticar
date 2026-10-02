@@ -1,0 +1,31 @@
+ok vou te enviar a lista das ferramentas + descrição + link para cada uma delas. e respondendo sua pergunta, dentro do card, centralizado horizontalmente na porção superior existe uma listração (png) um pouco maior que um ícone com leve fade na parte inferior para se fundir à cor do card, que varia em tons pasteis. vou manter os nomes dos pngs tipo card1.png para os ícones de cada card. aqui estão as ferramentas: 
+
+card1 Role play
+Simule uma conversa em Inglês em diferentes situações.
+https://dididoingles.github.io/roleplaycv/
+cor do card: #ffe7e7
+
+card2 Grammar
+Treine suas habilidades no present, past and future.
+https://dididoingles.github.io/Storychallenge/
+cor do card: #e9ddff
+
+card3 Leitor de textos (TTS)
+Insira seu texto e ouça a pronúncia correta.
+https://dididoingles.github.io/leitor/
+cor do card: #e3fac4
+
+card4 YouListen
+Pratique sua compreensão com vídeos curtinhos do YouTube.
+https://dididoingles.github.io/youlisten/
+cor do card: #ffd7d4
+
+card5 Você me conhece?
+Versão em Inglês do famoso "Perguntados" para casais.
+https://dididoingles.github.io/couples_trivia/
+cor do card: #d4e8ff
+
+card6 Airpaint Beta
+Desenhe usando gestos das mãos via webcam.
+https://dididoingles.github.io/airpaint/
+cor do card: #ffeee3

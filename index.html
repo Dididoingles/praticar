@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Praticar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Poppins:wght@100;200;300;400;600;700&family=Raleway:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            background-color: #ffffff;
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: -0.05em;
+            min-height: 100vh;
+        }
+
+        /* ============================================================
+           LOADER PAGE
+           ============================================================ */
+        .loader-screen {
+            position: fixed;
+            inset: 0;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            z-index: 9999;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        .loader-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-text {
+            font-family: 'Gochi Hand', cursive;
+            letter-spacing: normal;
+            font-size: 20px;
+            color: #222222;
+            opacity: 0;
+            animation: loaderTextFade 0.8s ease-out 0.2s forwards;
+            text-align: center;
+            padding: 0 24px;
+            min-height: 1.4em;
+            transition: opacity 0.4s ease;
+        }
+
+        .loader-text.fading {
+            opacity: 0;
+        }
+
+        @keyframes loaderTextFade {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 0.75; transform: translateY(0); }
+        }
+
+        .loader-spinner {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 3px solid rgba(194, 0, 0, 0.15);
+            border-top-color: #c20000;
+            animation: spinnerRotate 0.9s linear infinite;
+        }
+
+        @keyframes spinnerRotate {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============================================================
+           CONTAINER PRINCIPAL
+           ============================================================ */
+        .screen-container {
+            width: 100%;
+            max-width: 100%;
+            min-height: 100vh;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding: 12px 0;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        /* ============================================================
+           ANIMAÇÕES DE ENTRADA
+           ============================================================ */
+        @keyframes pageFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        .screen-container.loaded .city-bg-wrapper {
+            opacity: 0;
+            animation: pageFadeIn 1s ease-out 0.2s forwards;
+        }
+
+        .screen-container.loaded .logo-title-row,
+        .screen-container.loaded .logo-subtitle-container {
+            opacity: 0;
+            animation: pageFadeIn 1.2s ease-out 0.7s forwards;
+        }
+
+        .screen-container.loaded .choose-text {
+            opacity: 0;
+            animation: chooseTextFade 1.2s ease-out 1.3s forwards;
+        }
+
+        @keyframes chooseTextFade {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 0.55; transform: translateY(0); }
+        }
+
+        .screen-container.loaded .carousel-section {
+            opacity: 0;
+            animation: pageFadeIn 1s ease-out 1.7s forwards;
+        }
+
+        .screen-container.loaded footer {
+            opacity: 0;
+            animation: pageFadeIn 1s ease-out 2.1s forwards;
+        }
+
+        @keyframes sketchDraw {
+            0% { clip-path: inset(0 100% 0 0); filter: blur(1.5px); opacity: 0.6; }
+            40% { opacity: 1; }
+            100% { clip-path: inset(0 0 0 0); filter: blur(0); opacity: 1; }
+        }
+
+        @keyframes marsFade {
+            0%   { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes balaoDraw {
+            0% { clip-path: circle(0% at 50% 50%); opacity: 0.5; }
+            100% { clip-path: circle(75% at 50% 50%); opacity: 1; }
+        }
+
+        .robot-sketch,
+        .robot-mars,
+        .speech-balao {
+            opacity: 0;
+        }
+
+        .screen-container.loaded .robot-sketch {
+            animation: sketchDraw 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.9s both;
+        }
+
+        .screen-container.loaded .speech-balao {
+            animation: balaoDraw 1s cubic-bezier(0.65, 0, 0.35, 1) 1.1s both;
+        }
+
+        .screen-container.loaded .robot-mars {
+            animation: marsFade 1.2s ease-out 2.3s both;
+        }
+
+        /* HEADER */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            margin-bottom: 0;
+            padding: 0 16px;
+            flex-shrink: 0;
+        }
+
+        .logo-area {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            top: 5px;
+        }
+
+        .logo-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.05em;
+            font-size: 28px;
+            color: #c20000;
+            line-height: 1;
+        }
+
+        .speech-balao {
+            width: 38px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .logo-subtitle-container {
+            display: flex;
+            align-items: center;
+            margin-top: 4px;
+        }
+
+        .logo-subtitle {
+            font-family: 'Gochi Hand', cursive;
+            letter-spacing: normal;
+            line-height: 1.14;
+            font-size: 14px;
+            color: #222222;
+        }
+
+        .robot-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+        }
+
+        .robot-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .robot-sketch { z-index: 1; }
+        .robot-mars   { z-index: 2; }
+
+        /* SEÇÃO CENTRAL */
+        .city-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 4px 0 12px 0;
+            padding-top: 0;
+            flex-shrink: 0;
+        }
+
+        .city-bg-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            height: 130px;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .city-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center center;
+            display: block;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%);
+        }
+
+        .choose-text {
+            font-family: 'poppins', sans-serif;
+            letter-spacing: normal;
+            line-height: 1.14;
+            font-size: 12px;
+            color: #141414;
+            margin-top: 6px;
+            margin-bottom: 0;
+            text-align: center;
+            padding: 0 16px;
+            font-weight: 300;
+        }
+
+        /* ============================================================
+           BOTÃO "VER TUDO"
+           ============================================================ */
+        .view-all-btn {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: transparent;
+            border: 1px solid #c20000;
+            border-radius: 20px;
+            color: #c20000;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 11px;
+            letter-spacing: 0;
+            padding: 6px 12px;
+            cursor: pointer;
+            z-index: 15;
+            transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+
+        .view-all-btn:hover {
+            background-color: #c20000;
+            color: #ffffff;
+            transform: scale(1.04);
+        }
+
+        .view-all-btn:active {
+            transform: scale(0.96);
+        }
+
+        .view-all-btn svg {
+            width: 12px;
+            height: 12px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+            display: block;
+        }
+
+        /* ============================================================
+           CARROSSEL
+           MOBILE: altura aumentada para 380px, pois o card ativo tem
+           330px + as bolinhas (~10px) + margem de segurança. Sem isso,
+           a parte superior do card era cortada pelo overflow: hidden.
+           ============================================================ */
+        .carousel-section {
+            position: relative;
+            width: 100%;
+            height: 380px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin: 0;
+            touch-action: pan-y;
+            user-select: none;
+        }
+
+        .carousel-track {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+        }
+
+        .carousel-track:active {
+            cursor: grabbing;
+        }
+
+        /* ============================================================
+           CARD
+           ============================================================ */
+        .card-scale {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.7);
+            opacity: 0;
+            filter: blur(4px);
+            z-index: 0;
+            pointer-events: none;
+            transition:
+                transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform, opacity, filter;
+        }
+
+        .card {
+            width: 240px;
+            height: 330px;
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 22px 18px;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            flex-shrink: 0;
+        }
+
+        .card-art {
+            width: 62%;
+            max-width: 140px;
+            height: var(--art-height, 110px);
+            object-fit: contain;
+            display: block;
+            flex-shrink: 0;
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 100%);
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 100%);
+        }
+
+        .card-text {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 6px;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .card-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: var(--title-size, 17px);
+            color: #222222;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            text-align: center;
+            width: 100%;
+
+            display: -webkit-box;
+            -webkit-line-clamp: var(--title-lines, 2);
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: calc(1.15em * var(--title-lines, 2));
+        }
+
+        .card-desc {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+            font-size: var(--desc-size, 12px);
+            color: rgba(34, 34, 34, 0.75);
+            letter-spacing: -0.02em;
+            line-height: 1.35;
+            text-align: center;
+            width: 100%;
+
+            display: -webkit-box;
+            -webkit-line-clamp: var(--desc-lines, 3);
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: calc(1.35em * var(--desc-lines, 3));
+        }
+
+        .card-scale.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            filter: blur(0);
+            z-index: 3;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .card-scale.thumbnail-left {
+            transform: translate(-50%, -50%) translateX(calc(-50% - 20px)) scale(0.45);
+            opacity: 0.4;
+            filter: blur(1px);
+            z-index: 1;
+        }
+
+        .card-scale.thumbnail-right {
+            transform: translate(-50%, -50%) translateX(calc(50% + 20px)) scale(0.45);
+            opacity: 0.4;
+            filter: blur(1px);
+            z-index: 1;
+        }
+
+        .card-scale.hidden-card {
+            transform: translate(-50%, -50%) scale(0.3);
+            opacity: 0;
+            filter: blur(4px);
+            z-index: 0;
+        }
+
+        /* INDICADORES DE BOLINHAS */
+        .carousel-dots {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 5;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: #c20000;
+            opacity: 0.25;
+            cursor: pointer;
+            transition:
+                opacity 0.4s ease,
+                transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .dot.active {
+            opacity: 1;
+            width: 20px;
+            border-radius: 4px;
+        }
+
+        /* BOTÕES DE NAVEGAÇÃO */
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            line-height: 1;
+            background-color: transparent;
+            border: 1px solid #c20000;
+            border-radius: 50%;
+            color: #c20000;
+            font-size: 13px;
+            font-weight: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #c20000;
+            color: #ffffff;
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        .nav-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .prev-btn { left: 10px; }
+        .next-btn { right: 10px; }
+
+        /* RODAPÉ */
+        footer {
+            width: 100%;
+            text-align: center;
+            margin-top: 16px;
+            margin-bottom: 4px;
+            padding: 0 16px;
+        }
+
+        .footer-text {
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: -0.05em;
+            font-weight: 400;
+            font-size: 11px;
+            color: #666666;
+        }
+
+        /* ============================================================
+           OVERLAY INDIVIDUAL
+           ============================================================ */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .overlay-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(30, 30, 35, 0.45);
+            backdrop-filter: blur(18px) saturate(120%);
+            -webkit-backdrop-filter: blur(18px) saturate(120%);
+            transition: opacity 0.5s ease;
+        }
+
+        .overlay-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            padding: 20px;
+            perspective: 1200px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .floating-card-wrapper {
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.15s ease-out;
+            will-change: transform;
+            flex-shrink: 0;
+        }
+
+        .floating-card-wrapper .card-scale {
+            position: relative;
+            top: auto;
+            left: auto;
+            transform: none;
+            opacity: 1;
+            filter: none;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .floating-card-wrapper .card {
+            box-shadow:
+                0 20px 50px rgba(0,0,0,0.35),
+                0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .floating-card-wrapper .card.switching {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        .overlay.active .floating-card-wrapper .card {
+            animation: cardPopIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes cardPopIn {
+            0% {
+                transform: scale(0.6) translateZ(-100px);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1) translateZ(0);
+                opacity: 1;
+            }
+        }
+
+        .overlay-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            text-align: center;
+            padding: 0 16px;
+            max-width: 480px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s;
+        }
+
+        .overlay.active .overlay-info {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .overlay-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            color: #ffffff;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay-description {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: -0.02em;
+            line-height: 1.5;
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            text-align: center;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay-title.switching,
+        .overlay-description.switching {
+            opacity: 0;
+        }
+
+        .start-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: #c20000;
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.02em;
+            padding: 0 28px;
+            height: 46px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 6px 20px rgba(194, 0, 0, 0.4);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+        }
+
+        .start-btn:hover {
+            background-color: #a30000;
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 10px 28px rgba(194, 0, 0, 0.55);
+        }
+
+        .start-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .start-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: #ffffff;
+            stroke-width: 2;
+            fill: none;
+            display: block;
+            transition: transform 0.25s ease;
+        }
+
+        .start-btn:hover svg {
+            transform: translateX(4px);
+        }
+
+        .close-overlay {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            line-height: 1;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.25s ease, transform 0.25s ease;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+
+        .close-overlay:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(90deg);
+        }
+
+        .overlay-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            line-height: 1;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            transition: background 0.25s ease, transform 0.25s ease;
+            user-select: none;
+        }
+
+        .overlay-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        .overlay-nav-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .overlay-prev { left: 10px; }
+        .overlay-next { right: 10px; }
+
+        /* ============================================================
+           OVERLAY "VER TUDO"
+           ============================================================ */
+        .grid-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .grid-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .grid-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(30, 30, 35, 0.5);
+            backdrop-filter: blur(20px) saturate(120%);
+            -webkit-backdrop-filter: blur(20px) saturate(120%);
+        }
+
+        .grid-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 80px 16px 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .grid-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            color: #ffffff;
+            letter-spacing: -0.03em;
+            text-align: center;
+            margin-bottom: 8px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s;
+        }
+
+        .grid-overlay.active .grid-title {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            width: 100%;
+            max-width: 1100px;
+            justify-items: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+        }
+
+        .grid-overlay.active .grid-container {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .grid-card {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                        filter 0.35s ease;
+            will-change: transform;
+        }
+
+        .grid-card:hover {
+            transform: translateY(-6px) scale(1.03);
+            filter: drop-shadow(0 12px 24px rgba(0,0,0,0.35));
+        }
+
+        .grid-card:active {
+            transform: translateY(-2px) scale(1.0);
+        }
+
+        .grid-card .card {
+            width: 200px;
+            height: 275px;
+            padding: 18px 14px;
+            gap: 10px;
+            position: relative;
+            box-shadow:
+                0 10px 24px rgba(0,0,0,0.25),
+                0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .grid-card .card .card-art {
+            width: 60%;
+            max-width: 110px;
+            height: var(--art-height, 90px);
+        }
+
+        .grid-card .card .card-title {
+            font-size: 14px;
+        }
+
+        .grid-card .card .card-desc {
+            font-size: 11px;
+        }
+
+        .grid-overlay.active .grid-card {
+            animation: gridCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+        }
+
+        @keyframes gridCardIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .grid-close {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            line-height: 1;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.25s ease, transform 0.25s ease;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+
+        .grid-close:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(90deg);
+        }
+
+        /* ========================================================
+           MEDIA QUERY DESKTOP
+           ======================================================== */
+        @media (min-width: 1024px) {
+            .loader-text { font-size: 28px; }
+            .loader-spinner { width: 64px; height: 64px; border-width: 4px; }
+
+            .screen-container {
+                max-width: 100%;
+                min-height: 100vh;
+                padding: 30px 0 20px 0;
+                background-color: #ffffff;
+            }
+
+            header {
+                margin-bottom: 0;
+                padding: 0 80px;
+            }
+
+            .logo-title-row { top: 15px; }
+            .logo-title { font-size: 52px; }
+            .speech-balao { width: 68px; }
+            .logo-subtitle-container { margin-top: 10px; }
+            .logo-subtitle { font-size: 20px; }
+            .robot-container { width: 160px; height: 160px; }
+
+            .city-section {
+                margin: 0 0 20px 0;
+                font-weight: 300;
+            }
+
+            .city-bg-wrapper {
+                height: 320px;
+            }
+
+            .choose-text {
+                font-family: 'Raleway', sans-serif;
+                font-size: 18px;
+                font-weight: 300;
+                margin-top: 15px;
+                padding: 0 80px;
+                height: 134px;
+                box-sizing: content-box;
+                opacity: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .screen-container.loaded .choose-text {
+                opacity: 1;
+                animation: chooseTextFadeDesktop 1.2s ease-out 1.3s forwards;
+            }
+
+            @keyframes chooseTextFadeDesktop {
+                from { opacity: 0; transform: translateY(8px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+
+            .view-all-btn {
+                top: 12px;
+                right: 80px;
+                font-size: 13px;
+                padding: 8px 16px;
+                gap: 8px;
+            }
+
+            .view-all-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            .carousel-section {
+                height: 440px;
+            }
+
+            .carousel-track {
+                height: 438px;
+            }
+
+            .card {
+                width: 280px;
+                height: 380px;
+                padding: 26px 22px;
+                gap: 14px;
+            }
+
+            .card-art {
+                width: 55%;
+                max-width: 160px;
+                height: var(--art-height, 140px);
+            }
+
+            .card-title {
+                font-size: var(--title-size, 17px);
+            }
+
+            .card-desc {
+                font-size: var(--desc-size, 12px);
+            }
+
+            .card-scale.thumbnail-left {
+                transform: translate(-50%, -50%) translateX(calc(-50% - 60px)) scale(0.5);
+            }
+            .card-scale.thumbnail-right {
+                transform: translate(-50%, -50%) translateX(calc(50% + 60px)) scale(0.5);
+            }
+
+            .carousel-dots {
+                bottom: 10px;
+                gap: 10px;
+            }
+
+            .dot {
+                width: 9px;
+                height: 9px;
+            }
+
+            .dot.active {
+                width: 26px;
+            }
+
+            .nav-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 15px;
+                font-weight: 200;
+                background-color: transparent;
+                color: #c20000;
+                border: 1px solid #c20000;
+            }
+
+            .nav-btn:hover {
+                background-color: #c20000;
+                color: #ffffff;
+            }
+
+            .prev-btn { left: 40px; }
+            .next-btn { right: 40px; }
+
+            footer {
+                margin-top: 30px;
+                margin-bottom: 0;
+                padding: 0 80px;
+            }
+
+            .footer-text {
+                font-family: 'Raleway', sans-serif;
+                font-size: 15px;
+            }
+
+            .overlay-content {
+                flex-direction: row;
+                gap: 60px;
+                max-width: 1100px;
+                padding: 20px;
+            }
+
+            .floating-card-wrapper .card {
+                width: 276px;
+                height: 383px;
+                padding: 28px 22px;
+                gap: 16px;
+            }
+
+            .floating-card-wrapper .card .card-art {
+                width: 60%;
+                max-width: 170px;
+                height: var(--art-height, 150px);
+            }
+
+            .floating-card-wrapper .card .card-title {
+                font-size: var(--title-size, 20px);
+            }
+
+            .floating-card-wrapper .card .card-desc {
+                font-size: var(--desc-size, 13px);
+            }
+
+            .overlay-info {
+                align-items: flex-start;
+                text-align: left;
+                padding: 0;
+                max-width: 520px;
+                gap: 20px;
+            }
+
+            .overlay-title {
+                font-size: 26px;
+                justify-content: flex-start;
+                text-align: left;
+            }
+
+            .overlay-description {
+                font-size: 16px;
+                text-align: left;
+            }
+
+            .start-btn {
+                font-size: 17px;
+                height: 50px;
+                padding: 0 32px;
+            }
+
+            .overlay-nav-btn {
+                width: 47px;
+                height: 47px;
+                font-size: 15px;
+            }
+
+            .overlay-prev { left: 40px; }
+            .overlay-next { right: 40px; }
+
+            .close-overlay {
+                top: 32px;
+                right: 32px;
+                width: 40px;
+                height: 40px;
+                font-size: 15px;
+                font-weight: 200;
+            }
+
+            .grid-overlay {
+                align-items: center;
+            }
+
+            .grid-content {
+                padding: 80px 80px 60px;
+                gap: 32px;
+            }
+
+            .grid-title {
+                font-size: 30px;
+            }
+
+            .grid-container {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 28px;
+                max-width: 1300px;
+            }
+
+            .grid-card .card {
+                width: 280px;
+                height: 380px;
+                padding: 26px 22px;
+                gap: 14px;
+            }
+
+            .grid-card .card .card-art {
+                width: 55%;
+                max-width: 160px;
+                height: var(--art-height, 140px);
+            }
+
+            .grid-card .card .card-title {
+                font-size: var(--title-size, 17px);
+            }
+
+            .grid-card .card .card-desc {
+                font-size: var(--desc-size, 12px);
+            }
+
+            .grid-close {
+                top: 32px;
+                right: 32px;
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loader-screen" id="loaderScreen">
+        <div class="loader-spinner"></div>
+        <p class="loader-text" id="loaderText">A prática leva à perfeição</p>
+    </div>
+
+    <div class="screen-container" id="screenContainer">
+        <header>
+            <div class="logo-area">
+                <div class="logo-title-row">
+                    <h1 class="logo-title">Praticar</h1>
+                    <img src="balao.png" alt="Balão de fala" class="speech-balao">
+                </div>
+                <div class="logo-subtitle-container">
+                    <span class="logo-subtitle">A prática leva à perfeição</span>
+                </div>
+            </div>
+
+            <div class="robot-container">
+                <img src="sketch.png" alt="Robô Esboço" class="robot-layer robot-sketch">
+                <img src="mars.png" alt="Robô Colorido" class="robot-layer robot-mars">
+            </div>
+        </header>
+
+        <section class="city-section">
+            <div class="city-bg-wrapper">
+                <img src="center.png" alt="Ilustração da Cidade" class="city-img">
+            </div>
+            <h2 class="choose-text">Bem vindo ao nosso ambiente de prática! Aqui você pode escolher uma ferramenta beta para aprender e testar. </h2>
+        </section>
+
+        <section class="carousel-section" id="carouselSection">
+            <button class="view-all-btn" id="viewAllBtn" aria-label="Ver todas as ferramentas">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                </svg>
+                Ver tudo
+            </button>
+
+            <button class="nav-btn prev-btn" onclick="prevCard()">&#10094;</button>
+            <div class="carousel-track" id="carouselTrack"></div>
+            <button class="nav-btn next-btn" onclick="nextCard()">&#10095;</button>
+            <div class="carousel-dots" id="carouselDots"></div>
+        </section>
+
+        <footer>
+            <p class="footer-text">Desenvolvido por professora Diandra de Inglês</p>
+        </footer>
+    </div>
+
+    <div class="overlay" id="overlay">
+        <div class="overlay-backdrop" id="overlayBackdrop"></div>
+
+        <button class="close-overlay" id="closeOverlay" aria-label="Fechar">&#10005;</button>
+
+        <button class="overlay-nav-btn overlay-prev" id="overlayPrev" aria-label="Anterior">&#10094;</button>
+        <button class="overlay-nav-btn overlay-next" id="overlayNext" aria-label="Próximo">&#10095;</button>
+
+        <div class="overlay-content">
+            <div class="floating-card-wrapper" id="floatingCardWrapper">
+                <div class="card-scale" id="floatingCardScale">
+                    <div class="card" id="floatingCard">
+                        <img src="" alt="" class="card-art" id="floatingCardArt">
+                        <div class="card-text">
+                            <h3 class="card-title" id="floatingCardTitle"></h3>
+                            <p class="card-desc" id="floatingCardDesc"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overlay-info">
+                <h3 class="overlay-title" id="overlayTitle">Nome da Ferramenta</h3>
+                <p class="overlay-description" id="overlayDescription">
+                    Descrição da ferramenta.
+                </p>
+                <a href="#" target="_blank" rel="noopener noreferrer" class="start-btn" id="startBtn">
+                    Começar
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-overlay" id="gridOverlay">
+        <div class="grid-backdrop" id="gridBackdrop"></div>
+
+        <button class="grid-close" id="gridClose" aria-label="Fechar">&#10005;</button>
+
+        <div class="grid-content">
+            <h2 class="grid-title">Todas as ferramentas</h2>
+            <div class="grid-container" id="gridContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        const loaderPhrases = [
+            'A prática leva à perfeição',
+            'Pequenos passos, grandes conquistas',
+            'Errar faz parte de aprender',
+            'Quem pratica, evolui'
+        ];
+
+        const PHRASE_INTERVAL_MS = 2000;
+
+        let phraseIntervalId = null;
+        let phraseList = [];
+        let phraseIndex = 0;
+
+        function startPhraseRotation() {
+            const loaderTextEl = document.getElementById('loaderText');
+            if (!loaderTextEl) return;
+
+            phraseList = [...loaderPhrases].sort(() => Math.random() - 0.5);
+            phraseIndex = 0;
+            loaderTextEl.textContent = phraseList[phraseIndex];
+
+            phraseIntervalId = setInterval(() => {
+                loaderTextEl.classList.add('fading');
+
+                setTimeout(() => {
+                    phraseIndex = (phraseIndex + 1) % phraseList.length;
+                    loaderTextEl.textContent = phraseList[phraseIndex];
+                    loaderTextEl.classList.remove('fading');
+                }, 400);
+            }, PHRASE_INTERVAL_MS);
+        }
+
+        function stopPhraseRotation() {
+            if (phraseIntervalId) {
+                clearInterval(phraseIntervalId);
+                phraseIntervalId = null;
+            }
+        }
+
+        const cardsData = [
+            {
+                art: 'card1.png',
+                title: 'Role play',
+                description: 'Simule uma conversa em Inglês em diferentes situações.',
+                link: 'https://dididoingles.github.io/roleplay/home.html',
+                color: '#ffe7e7',
+                layout: { artHeight: 130, titleSize: '17px', descSize: '12px', titleLines: 1, descLines: 2 }
+            },
+            {
+                art: 'card2.png',
+                title: 'Grammar',
+                description: 'Treine suas habilidades no present, past and future.',
+                link: 'https://dididoingles.github.io/Storychallenge/',
+                color: '#e9ddff',
+                layout: { artHeight: 130, titleSize: '17px', descSize: '12px', titleLines: 1, descLines: 2 }
+            },
+            {
+                art: 'card3.png',
+                title: 'Leitor de textos (TTS)',
+                description: 'Insira seu texto e ouça a pronúncia correta.',
+                link: 'https://dididoingles.github.io/leitor/',
+                color: '#e3fac4',
+                layout: { artHeight: 120, titleSize: '15px', descSize: '12px', titleLines: 2, descLines: 2 }
+            },
+            {
+                art: 'card4.png',
+                title: 'YouListen',
+                description: 'Pratique sua compreensão com vídeos curtinhos do YouTube.',
+                link: 'https://dididoingles.github.io/youlisten/',
+                color: '#ffd7d4',
+                layout: { artHeight: 130, titleSize: '17px', descSize: '12px', titleLines: 1, descLines: 3 }
+            },
+            {
+                art: 'card5.png',
+                title: 'Você me conhece?',
+                description: 'Versão em Inglês do famoso "Perguntados" para casais.',
+                link: 'https://dididoingles.github.io/couples_trivia/',
+                color: '#d4e8ff',
+                layout: { artHeight: 130, titleSize: '17px', descSize: '12px', titleLines: 2, descLines: 2 }
+            },
+            {
+                art: 'card6.png',
+                title: 'Airpaint Beta',
+                description: 'Desenhe usando gestos das mãos via webcam.',
+                link: 'https://dididoingles.github.io/airpaint/',
+                color: '#ffeee3',
+                layout: { artHeight: 130, titleSize: '17px', descSize: '12px', titleLines: 1, descLines: 2 }
+            }
+        ];
+
+        const imagesToPreload = [
+            'balao.png',
+            'sketch.png',
+            'mars.png',
+            'center.png',
+            ...cardsData.map(c => c.art)
+        ];
+
+        let currentIndex = 0;
+
+        function preloadImages() {
+            let loaded = 0;
+            const total = imagesToPreload.length;
+
+            return new Promise((resolve) => {
+                if (total === 0) return resolve();
+
+                imagesToPreload.forEach((src) => {
+                    const img = new Image();
+
+                    const done = () => {
+                        loaded++;
+                        if (loaded === total) resolve();
+                    };
+
+                    img.onload = done;
+                    img.onerror = () => {
+                        console.warn('Falha ao carregar:', src);
+                        done();
+                    };
+
+                    img.src = src;
+                });
+
+                setTimeout(resolve, 8000);
+            });
+        }
+
+        function applyLayout(el, layout) {
+            if (!layout) return;
+
+            if (layout.artHeight)  el.style.setProperty('--art-height',  layout.artHeight + 'px');
+            if (layout.titleSize)  el.style.setProperty('--title-size',  layout.titleSize);
+            if (layout.descSize)   el.style.setProperty('--desc-size',   layout.descSize);
+            if (layout.titleLines) el.style.setProperty('--title-lines', layout.titleLines);
+            if (layout.descLines)  el.style.setProperty('--desc-lines',  layout.descLines);
+        }
+
+        function createCardElement(data, index) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.backgroundColor = data.color;
+
+            applyLayout(card, data.layout);
+
+            const art = document.createElement('img');
+            art.src = data.art;
+            art.alt = data.title;
+            art.className = 'card-art';
+
+            const textBlock = document.createElement('div');
+            textBlock.className = 'card-text';
+
+            const title = document.createElement('h3');
+            title.className = 'card-title';
+            title.textContent = data.title;
+
+            const desc = document.createElement('p');
+            desc.className = 'card-desc';
+            desc.textContent = data.description;
+
+            textBlock.appendChild(title);
+            textBlock.appendChild(desc);
+
+            card.appendChild(art);
+            card.appendChild(textBlock);
+
+            card.dataset.index = index;
+
+            return card;
+        }
+
+        async function init() {
+            buildCarousel();
+            buildGrid();
+            updateCarousel();
+
+            startPhraseRotation();
+
+            await preloadImages();
+            await new Promise(r => setTimeout(r, 200));
+
+            stopPhraseRotation();
+            const loader = document.getElementById('loaderScreen');
+            loader.classList.add('hidden');
+
+            const container = document.getElementById('screenContainer');
+            container.classList.add('loaded');
+        }
+
+        function buildCarousel() {
+            const track = document.getElementById('carouselTrack');
+            track.innerHTML = '';
+
+            cardsData.forEach((data, i) => {
+                const scale = document.createElement('div');
+                scale.className = 'card-scale hidden-card';
+                scale.dataset.index = i;
+
+                const card = createCardElement(data, i);
+                scale.appendChild(card);
+                track.appendChild(scale);
+
+                scale.addEventListener('click', () => {
+                    if (i === currentIndex) openOverlay(i);
+                });
+            });
+
+            buildDots();
+        }
+
+        function buildDots() {
+            const dotsContainer = document.getElementById('carouselDots');
+            dotsContainer.innerHTML = '';
+
+            cardsData.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'dot' + (i === 0 ? ' active' : '');
+                dot.dataset.index = i;
+                dot.addEventListener('click', () => goToCard(i));
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        function updateDots() {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentIndex);
+            });
+        }
+
+        function goToCard(index) {
+            if (index === currentIndex) return;
+            currentIndex = index;
+            updateCarousel();
+        }
+
+        function updateCarousel() {
+            const track = document.getElementById('carouselTrack');
+            const allScales = track.querySelectorAll('.card-scale');
+            const total = cardsData.length;
+
+            const prevIndex = (currentIndex - 1 + total) % total;
+            const nextIndex = (currentIndex + 1) % total;
+
+            allScales.forEach((scale, i) => {
+                scale.classList.remove('active', 'thumbnail-left', 'thumbnail-right', 'hidden-card');
+
+                if (i === currentIndex) {
+                    scale.classList.add('active');
+                } else if (i === prevIndex) {
+                    scale.classList.add('thumbnail-left');
+                } else if (i === nextIndex) {
+                    scale.classList.add('thumbnail-right');
+                } else {
+                    scale.classList.add('hidden-card');
+                }
+            });
+
+            updateDots();
+        }
+
+        function nextCard() {
+            currentIndex = (currentIndex + 1) % cardsData.length;
+            updateCarousel();
+        }
+
+        function prevCard() {
+            currentIndex = (currentIndex - 1 + cardsData.length) % cardsData.length;
+            updateCarousel();
+        }
+
+        function buildGrid() {
+            const container = document.getElementById('gridContainer');
+            container.innerHTML = '';
+
+            cardsData.forEach((data, i) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'grid-card';
+                wrapper.style.animationDelay = (i * 0.06) + 's';
+
+                const card = createCardElement(data, i);
+                wrapper.appendChild(card);
+                container.appendChild(wrapper);
+
+                wrapper.addEventListener('click', () => {
+                    window.open(data.link, '_blank', 'noopener,noreferrer');
+                });
+            });
+        }
+
+        const gridOverlay = document.getElementById('gridOverlay');
+        const gridBackdrop = document.getElementById('gridBackdrop');
+        const gridClose = document.getElementById('gridClose');
+        const viewAllBtn = document.getElementById('viewAllBtn');
+
+        function openGrid() {
+            gridOverlay.classList.add('active');
+            const content = gridOverlay.querySelector('.grid-content');
+            if (content) content.scrollTop = 0;
+        }
+
+        function closeGrid() {
+            gridOverlay.classList.remove('active');
+        }
+
+        viewAllBtn.addEventListener('click', openGrid);
+        gridBackdrop.addEventListener('click', closeGrid);
+        gridClose.addEventListener('click', closeGrid);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && gridOverlay.classList.contains('active')
+                && !overlay.classList.contains('active')) {
+                closeGrid();
+            }
+        });
+
+        const overlay = document.getElementById('overlay');
+        const overlayBackdrop = document.getElementById('overlayBackdrop');
+        const closeOverlayBtn = document.getElementById('closeOverlay');
+        const floatingCard = document.getElementById('floatingCard');
+        const floatingCardArt = document.getElementById('floatingCardArt');
+        const floatingCardTitle = document.getElementById('floatingCardTitle');
+        const floatingCardDesc = document.getElementById('floatingCardDesc');
+        const floatingCardWrapper = document.getElementById('floatingCardWrapper');
+        const overlayTitle = document.getElementById('overlayTitle');
+        const overlayDescription = document.getElementById('overlayDescription');
+        const startBtn = document.getElementById('startBtn');
+        const overlayPrev = document.getElementById('overlayPrev');
+        const overlayNext = document.getElementById('overlayNext');
+
+        let isOverlayOpen = false;
+        let mouseMoveHandler = null;
+        let isSwitchingCard = false;
+
+        function populateOverlay(index) {
+            const data = cardsData[index];
+
+            floatingCard.style.backgroundColor = data.color;
+            applyLayout(floatingCard, data.layout);
+
+            floatingCardArt.src = data.art;
+            floatingCardArt.alt = data.title;
+            floatingCardTitle.textContent = data.title;
+            floatingCardDesc.textContent = data.description;
+
+            overlayTitle.textContent = data.title;
+            overlayDescription.textContent = data.description;
+            startBtn.href = data.link;
+        }
+
+        function openOverlay(index) {
+            populateOverlay(index);
+
+            overlay.classList.add('active');
+            isOverlayOpen = true;
+
+            floatingCardWrapper.style.transform = 'rotateX(0deg) rotateY(0deg)';
+
+            mouseMoveHandler = handleMouseMove;
+            document.addEventListener('mousemove', mouseMoveHandler);
+        }
+
+        function closeOverlay() {
+            overlay.classList.remove('active');
+            isOverlayOpen = false;
+
+            if (mouseMoveHandler) {
+                document.removeEventListener('mousemove', mouseMoveHandler);
+                mouseMoveHandler = null;
+            }
+
+            floatingCardWrapper.style.transform = 'rotateX(0deg) rotateY(0deg)';
+        }
+
+        function handleMouseMove(e) {
+            if (!isOverlayOpen) return;
+
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            const deltaX = (e.clientX - centerX) / centerX;
+            const deltaY = (e.clientY - centerY) / centerY;
+
+            const maxRotate = 12;
+
+            const rotateY = deltaX * maxRotate;
+            const rotateX = -deltaY * maxRotate;
+
+            floatingCardWrapper.style.transform =
+                `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        }
+
+        function switchOverlayCard(newIndex) {
+            if (isSwitchingCard) return;
+            if (newIndex === currentIndex) return;
+
+            isSwitchingCard = true;
+
+            currentIndex = newIndex;
+            updateCarousel();
+
+            floatingCard.classList.add('switching');
+            overlayTitle.classList.add('switching');
+            overlayDescription.classList.add('switching');
+
+            setTimeout(() => {
+                populateOverlay(currentIndex);
+
+                floatingCard.classList.remove('switching');
+                overlayTitle.classList.remove('switching');
+                overlayDescription.classList.remove('switching');
+
+                isSwitchingCard = false;
+            }, 300);
+        }
+
+        overlayBackdrop.addEventListener('click', closeOverlay);
+        closeOverlayBtn.addEventListener('click', closeOverlay);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isOverlayOpen) {
+                closeOverlay();
+            } else if (e.key === 'ArrowRight' && isOverlayOpen) {
+                switchOverlayCard((currentIndex + 1) % cardsData.length);
+            } else if (e.key === 'ArrowLeft' && isOverlayOpen) {
+                switchOverlayCard((currentIndex - 1 + cardsData.length) % cardsData.length);
+            }
+        });
+
+        overlayPrev.addEventListener('click', (e) => {
+            e.stopPropagation();
+            switchOverlayCard((currentIndex - 1 + cardsData.length) % cardsData.length);
+        });
+
+        overlayNext.addEventListener('click', (e) => {
+            e.stopPropagation();
+            switchOverlayCard((currentIndex + 1) % cardsData.length);
+        });
+
+        let overlayStartX = 0;
+        let overlayStartY = 0;
+        let overlayDragging = false;
+        const overlayThreshold = 40;
+
+        const overlayContent = document.querySelector('.overlay-content');
+
+        overlayContent.addEventListener('touchstart', (e) => {
+            overlayStartX = e.touches[0].clientX;
+            overlayStartY = e.touches[0].clientY;
+            overlayDragging = true;
+        }, { passive: true });
+
+        overlayContent.addEventListener('touchmove', (e) => {
+            if (!overlayDragging) return;
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const diffX = currentX - overlayStartX;
+            const diffY = currentY - overlayStartY;
+
+            if (Math.abs(diffX) > overlayThreshold && Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0) {
+                    switchOverlayCard((currentIndex - 1 + cardsData.length) % cardsData.length);
+                } else {
+                    switchOverlayCard((currentIndex + 1) % cardsData.length);
+                }
+                overlayDragging = false;
+            }
+        }, { passive: true });
+
+        overlayContent.addEventListener('touchend', () => {
+            overlayDragging = false;
+        });
+
+        let startX = 0;
+        let isDragging = false;
+        const threshold = 30;
+
+        const trackElement = document.getElementById('carouselTrack');
+
+        trackElement.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+        }, { passive: true });
+
+        trackElement.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const currentX = e.touches[0].clientX;
+            const diff = currentX - startX;
+
+            if (Math.abs(diff) > threshold) {
+                if (diff > 0) { prevCard(); } else { nextCard(); }
+                isDragging = false;
+            }
+        }, { passive: true });
+
+        trackElement.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        trackElement.addEventListener('mousedown', (e) => {
+            startX = e.clientX;
+            isDragging = true;
+        });
+
+        trackElement.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const currentX = e.clientX;
+            const diff = currentX - startX;
+
+            if (Math.abs(diff) > threshold) {
+                if (diff > 0) { prevCard(); } else { nextCard(); }
+                isDragging = false;
+            }
+        });
+
+        trackElement.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        trackElement.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
